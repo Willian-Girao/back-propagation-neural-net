@@ -77,17 +77,13 @@ void svm_backpropagate(int label) {
 	b->gradient = 0.0;
 	c->gradient = 0.0;
 
+	s->gradient = 0.0;
+
 	if (label == 1 && s->value < 1) {
 		s->gradient = 1.0;
 	} 
 	if (label == -1 && s->value > -1) {
 		s->gradient = -1.0;
-	} 
-	if (label == -1 && s->value < -1) {
-		s->gradient = 0.0;
-	} 
-	if (label == 1 && s->value > 1) {
-		s->gradient = 0.0;
 	}
 
 	addGateBackProp(axpby, c, s);
