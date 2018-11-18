@@ -43,6 +43,7 @@ hidden_layer* set_layer(int num_neurons, int num_coefs) {
 	return layer;
 }
 
+/* Prints the coeficients of all the neurons in a sigle hidden layer */
 void print_hidden_layer(hidden_layer* l) {
 	hidden_layer* x = l;
 	while(x) {
@@ -57,6 +58,7 @@ typedef struct layers {
 	struct layers *previous_layer;
 } hidden_layers;
 
+/* Populates the sctructure utilized to build up the hidden layers set */
 hidden_layers* set_layers_element(hidden_layer *l_k, hidden_layers *previous) {
 	hidden_layers* layers_set_element = (hidden_layers*)malloc(sizeof(hidden_layers*));
 
@@ -67,6 +69,7 @@ hidden_layers* set_layers_element(hidden_layer *l_k, hidden_layers *previous) {
 	return layers_set_element;
 }
 
+/* Inserts a hidden layer into the correct position ino the set of hidden layers */
 hidden_layers* insert_into_hidden_layers_set(hidden_layers *root, hidden_layer *new_layer) {
 	if (!root) {
 		return set_layers_element(new_layer, NULL);
@@ -81,6 +84,7 @@ hidden_layers* insert_into_hidden_layers_set(hidden_layers *root, hidden_layer *
 	return root;
 }
 
+/* Sets up all the hidden layers */
 hidden_layers* set_all_hidden_layers(int num_layers, int num_neurons, int num_coefs) {
 	hidden_layers *root = NULL;
 
@@ -94,6 +98,7 @@ hidden_layers* set_all_hidden_layers(int num_layers, int num_neurons, int num_co
 	return root;
 }
 
+/* Prints the coeficients of aech neuron in each hidden layer*/
 void print_hidden_layers(hidden_layers* root) {
 	hidden_layers* aux = root;
 	while(aux) {

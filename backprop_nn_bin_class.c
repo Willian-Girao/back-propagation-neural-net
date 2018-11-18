@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "hidden_layers_helper.h"
+#include "forward_helper.h"
 
 #define STEPSIZE 0.01
 
