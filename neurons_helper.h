@@ -9,7 +9,7 @@ typedef struct units {
 
 /* List of coeficients need for the network */
 typedef struct coefs {
-	double x_i; /* Value */
+	double y_i; /* Value */
 	struct coefs *next; /* Pointer to other coeficients */
 } coeficients;
 
@@ -17,11 +17,11 @@ typedef struct coefs {
 coeficients* init_neurons_coefs(int num_coefs) {
 
 	coeficients* head_coef = (coeficients*)malloc(sizeof(coeficients*));
-	head_coef->x_i = rand() % 6;
+	head_coef->y_i = rand() % 6;
 
 	for (int i = 0; i < num_coefs-1; ++i)	{
 		coeficients* new_coef = (coeficients*)malloc(sizeof(coeficients*));
-		new_coef->x_i = rand() % 6;
+		new_coef->y_i = rand() % 6;
 
 		coeficients* aux = head_coef;
 		while(aux->next) {
@@ -49,7 +49,7 @@ neuron* new_neuron(double v, double g, int num_coefs) {
 void print_neuron_coefs(coeficients *n) {
 	coeficients* aux = n;
 	while(aux) {
-		printf("%.2lf ", aux->x_i);
+		printf("%.2lf ", aux->y_i);
 		aux = aux->next;
 	}
 	printf("\n");

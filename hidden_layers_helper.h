@@ -52,6 +52,15 @@ void print_hidden_layer(hidden_layer* l) {
 	}
 }
 
+/* Prints the output values of all the neurons in a sigle hidden layer */
+void print_hidden_layer_neuros_output(hidden_layer* l) {
+	hidden_layer* x = l;
+	while(x) {
+		printf("%.2lf\n", x->n_j->v);
+		x = x->next;
+	}
+}
+
 typedef struct layers {
 	hidden_layer *layer_k;
 	struct layers *next_layer;
@@ -89,10 +98,11 @@ hidden_layers* set_all_hidden_layers(int num_layers, int num_neurons, int num_co
 	hidden_layers *root = NULL;
 
 	for (int k = 0; k < num_layers; ++k) {
-		hidden_layer* new_layer_k = set_layer(num_neurons, num_coefs);
-		print_hidden_layer(new_layer_k);
-		printf("\n");
-		root = insert_into_hidden_layers_set(root, new_layer_k);
+		if (!root) { /* 1st layer - number of coeficients needed is proportional to the dimension of the datapoint */
+			root = insert_into_hidden_layers_set(root, set_layer(num_neurons, num_coefs));
+		} else { /* k-th layer -number of coeficients needed is proportional to the number of neurons in the previous layer */
+			root = insert_into_hidden_layers_set(root, set_layer(num_neurons, (num_neurons + 1)));
+		}
 	}
 
 	return root;
@@ -103,6 +113,16 @@ void print_hidden_layers(hidden_layers* root) {
 	hidden_layers* aux = root;
 	while(aux) {
 		print_hidden_layer(aux->layer_k);
+		printf("\n");
+		aux = aux->next_layer;
+	}
+}
+
+/* Prints the output values of aech neuron in each hidden layer*/
+void print_neurons_outputs(hidden_layers* root) {
+	hidden_layers* aux = root;
+	while(aux) {
+		print_hidden_layer_neuros_output(aux->layer_k);
 		printf("\n");
 		aux = aux->next_layer;
 	}
