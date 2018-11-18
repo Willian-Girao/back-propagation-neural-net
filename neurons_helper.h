@@ -31,8 +31,6 @@ coeficients* init_neurons_coefs(int num_coefs) {
 		aux->next = new_coef;
 	}
 
-	printf("\n");
-
 	return head_coef;
 }
 

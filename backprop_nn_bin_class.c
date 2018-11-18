@@ -6,15 +6,17 @@
 
 #define STEPSIZE 0.01
 
+/* set_all_hidden_layers(int num_layers, int num_neurons, int num_coefs) */
+
 int main() {
 	time_t t;
 	srand((unsigned) time(&t));
 
-	hidden_layer* layer1 = set_layer(3, 4);
-	
-	printf("========================================\n");
+	hidden_layers* hidden_layers_set = set_all_hidden_layers(3, 2, 2);
 
-	print_hidden_layer(layer1);
+	printf("=======================================\n");
+
+	print_hidden_layers(hidden_layers_set);
 
 	return 0;
 }
