@@ -2,6 +2,9 @@
 
 Implementations in C of Machine Learning models (WIP).
 
+* **Suport Vector Machine**
+* **Back Propagation Neural Network**
+
 ## Suport Vector Machine (SVM)
 
 A standar implementation of a standard SVM to perform binary classification.
