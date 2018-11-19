@@ -3,7 +3,7 @@
 /* Structure representing a neuron */
 typedef struct units {
 	double v; /* Neuron's output value */
-	double g; /* Neuros's gradient to be back-propagated */
+	double g; /* Neuros's gradient to be utilized to update its coeficients (pull from above in the chain) */
 	struct coefs *coefs; /* This neuron's coeficients */
 } neuron;
 
@@ -49,7 +49,7 @@ neuron* new_neuron(double v, double g, int num_coefs) {
 void print_neuron_coefs(coeficients *n) {
 	coeficients* aux = n;
 	while(aux) {
-		printf("%.2lf ", aux->y_i);
+		printf("%lf ", aux->y_i);
 		aux = aux->next;
 	}
 	printf("\n");
