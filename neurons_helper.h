@@ -1,4 +1,5 @@
 #include <time.h>
+#define COEF_INTERVAL 0.5
 
 /* Structure representing a neuron */
 typedef struct units {
@@ -13,15 +14,20 @@ typedef struct coefs {
 	struct coefs *next; /* Pointer to other coeficients */
 } coeficients;
 
+double initial_random_coef() {
+	double random = ((double)rand() / (double)RAND_MAX);
+	return (random >= 0.5) ? random * COEF_INTERVAL : -random * COEF_INTERVAL;
+}
+
 /* Initialize a neuron's coeficients */
 coeficients* init_neurons_coefs(int num_coefs) {
 
 	coeficients* head_coef = (coeficients*)malloc(sizeof(coeficients*));
-	head_coef->y_i = rand() % 6;
+	head_coef->y_i = initial_random_coef();
 
 	for (int i = 0; i < num_coefs-1; ++i)	{
 		coeficients* new_coef = (coeficients*)malloc(sizeof(coeficients*));
-		new_coef->y_i = rand() % 6;
+		new_coef->y_i = initial_random_coef();
 
 		coeficients* aux = head_coef;
 		while(aux->next) {

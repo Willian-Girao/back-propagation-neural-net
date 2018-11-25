@@ -1,6 +1,10 @@
 #include "hidden_layers_helper.h"
 #include "datapoints_helper.h"
 
+double max(double a, double b) {
+	return (a >= b) ? a : b;
+}
+
 /* HELPER FUNCTION - makes a neuron do its calculations */
 void operate_neuron(neuron *n_j, datapoint *data) {
 	coeficients *aux_y = n_j->coefs;
@@ -12,8 +16,8 @@ void operate_neuron(neuron *n_j, datapoint *data) {
 
 		aux_y = aux_y->next;
 		if (!aux_y->next) { /* All the "multipliables" coeficients have been updated */
-			result += aux_y->y_i;
-			n_j->v = result;
+			result += aux_y->y_i; /* Neuron bias */
+			n_j->v = max(0.0, result); /* ReLu activation function */
 
 			return;
 		}
@@ -44,6 +48,7 @@ void forward_datapoint_inlayer(hidden_layer *layer_k, datapoint *cur_datapoint) 
 
 	while (aux_k) { /* Loops through each neuron of the given layer */
 		operate_neuron(aux_k->n_j, cur_datapoint);
+		//printf("[%.2lf]\n", aux_k->n_j->v);
 		aux_k = aux_k->next;
 	}
 }

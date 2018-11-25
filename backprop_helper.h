@@ -23,7 +23,7 @@ void make_neuron_respond_to_pull(neuron *n_j, datapoint *data, double stepsize) 
 
 		aux_y = aux_y->next;
 		if (!aux_y->next) { /* All the "multipliables" coeficients have been updated */
-			aux_y->y_i += 1.0 * n_j->g; /* Last neuron coeficient responds to the pull by the partial derivative of a sum */
+			aux_y->y_i += stepsize * (1.0 * n_j->g); /* Last neuron coeficient responds to the pull by the partial derivative of a sum */
 			return;
 		}
 		aux_x = aux_x->next;
@@ -44,30 +44,32 @@ void make_layer_respond_to_pull(hidden_layer *layer_k, datapoint *data, double s
 datapoint* update_output_neuron_coeficients(output_neuron *out_neuron, datapoint *last_layer_outputs, double pull, double stepsize) {
 	
 	coeficients *out_neuron_aux = out_neuron->coefs;
-	datapoint *n_i = last_layer_outputs;
 	datapoint* to_backprop = NULL;
 
 	while (out_neuron_aux) { /* Loop through all the neuron's coeficients and the last layers outputs */
-		double y = out_neuron_aux->y_i;
-		double n = n_i->x_i;
-
-		out_neuron_aux->y_i += stepsize * (n * pull - y); /* Update output neuron coeficients */
-		to_backprop = build_datapoint((y * pull), to_backprop); /* Saves the pull that will be sent to the neurons n_i in the previous layer */
+		double before_change = out_neuron_aux->y_i;
+		out_neuron_aux->y_i += stepsize * ((last_layer_outputs->x_i * pull) + (-out_neuron_aux->y_i)); /* Update output neuron coeficients */
+		//printf("^%lf^\n", stepsize * ((last_layer_outputs->x_i * pull) + (-out_neuron_aux->y_i)));
+		to_backprop = build_datapoint((before_change * pull), to_backprop); /* Saves the pull that will be sent to the neurons n_i in the previous layer */
 
 		out_neuron_aux = out_neuron_aux->next;
 		if (!out_neuron_aux->next) { /* All the "multipliables" coeficients have been updated */
+			//printf("^%lf^\n", stepsize * (1.0 * pull));
 			out_neuron_aux->y_i += stepsize * (1.0 * pull); /* Last neuron coeficient responds to the pull by the partial derivative of a sum */
+
 			return to_backprop;
 		}
-		n_i = n_i->next;
+		last_layer_outputs = last_layer_outputs->next;
 	}
 }
 
 /* Updates all the pulls sent from above for all the neurons in the given layer */
-void update_neuron_pull(hidden_layer *layer, datapoint *pulls_from_above) {
-	hidden_layer *aux_layer = layer;
-	while (aux_layer) {
-		aux_layer->n_j->g = pulls_from_above->x_i;
+void update_neuron_pull(hidden_layers *layer, datapoint *pulls_from_above) {
+	hidden_layer *aux_layer = layer->layer_k;
+
+	while(aux_layer) {
+		aux_layer->n_j->g = (aux_layer->n_j->v == 0.0) ? 0.0 : pulls_from_above->x_i;
+		//printf("(%.2lf)\n", aux_layer->n_j->g);
 		aux_layer = aux_layer->next;
 		pulls_from_above = pulls_from_above->next;
 	}
@@ -83,6 +85,9 @@ void set_existing_pull_to_zero(hidden_layer *layer) {
 }
 
 void backpropagate_pull_update(hidden_layers *curr_layer) {
+	if (!curr_layer->previous_layer) {
+		return;
+	}
 
 	/* Resete existing gradients in the previous hidde layer */
 	set_existing_pull_to_zero(curr_layer->previous_layer->layer_k);
@@ -111,15 +116,15 @@ void backpropagate_pull_update(hidden_layers *curr_layer) {
 
 /* HELPER FUNCTION - updates "backproped_gradients" */
 void update_hidden_layers_pulls(hidden_layers *curr_layer) {
-	if (!curr_layer->previous_layer) {  /* 1st hidden layer - there are no remaining "previous layers" to update local derivatives */ 
-		return;
-	}
-
 	/* Update local derivatives of the layer before this current layer */
 	backpropagate_pull_update(curr_layer);
 
 	/* Recursively goes to the laye before this current layer */
-	update_hidden_layers_pulls(curr_layer->previous_layer);
+	if (curr_layer->previous_layer)	{
+		update_hidden_layers_pulls(curr_layer->previous_layer);
+	}
+
+	return;
 }
 
 /* HELPER FUNCTION - updates the the coeficients of the given layer */
@@ -131,11 +136,16 @@ void update_coeficients(hidden_layers *curr_layer, datapoint *last_layer_outputs
 		coeficients *coef_aux = curr_layer_aux->n_j->coefs;
 
 		while (coef_aux) { /* Visit nth neuron's jth coeficient */
-			coef_aux->y_i += stepsize * (last_layer_outputs_aux->x_i * curr_layer_aux->n_j->g - coef_aux->y_i);
+			double da1 = (last_layer_outputs_aux->x_i * curr_layer_aux->n_j->g);
+			double a1 = coef_aux->y_i;
+			da1 += -a1;
+			//printf("{%lf}\n", stepsize * da1);
+			coef_aux->y_i += stepsize * da1;
 
 			coef_aux = coef_aux->next;
 			if (!coef_aux->next) {
-				coef_aux->y_i += 1.0 * curr_layer_aux->n_j->g;
+				//printf("{%lf}\n", stepsize * (1.0 * curr_layer_aux->n_j->g));
+				coef_aux->y_i += stepsize * (1.0 * curr_layer_aux->n_j->g);
 				break;
 			}
 			last_layer_outputs_aux = last_layer_outputs_aux->next;
@@ -159,18 +169,14 @@ void update_all_neurons_coeficients(hidden_layers *last_layer, datapoint* origin
 	} else {
 		update_all_neurons_coeficients(last_layer->previous_layer, layer_neurons_outputs(last_layer->previous_layer->previous_layer->layer_k), stepsize);
 	}
-
 }
 
 void network_backprop(output_neuron *out_neuron, double pull, double stepsize, datapoint* data) {
-	/* Update the output neuron coeficients - 'backproped_gradients' holds the pulls to be sent to the last hidden layer (before the output neuron) */
-	datapoint *backproped_gradients = update_output_neuron_coeficients(out_neuron, layer_neurons_outputs(out_neuron->last_layer->layer_k), pull, stepsize);
+	/* Update the output neuron coeficients - 'backproped_derivatives' holds the pulls to be sent to the last hidden layer (before the output neuron) */
+	datapoint *backproped_derivatives = update_output_neuron_coeficients(out_neuron, layer_neurons_outputs(out_neuron->last_layer->layer_k), pull, stepsize);
 
-	/* Updates the hidden layer closest to the output neuron */
-	update_neuron_pull(out_neuron->last_layer->layer_k, backproped_gradients);
-
-	/* Updates the pulls of the remaining hidden layers */
-	update_hidden_layers_pulls(out_neuron->last_layer);
+	/* Updates the local gradients in the neurons in the hidden layers */
+	update_neuron_pull(out_neuron->last_layer, backproped_derivatives);
 
 	/* Updates all the coeficients of the neurons in the hidden layers */
 	update_all_neurons_coeficients(out_neuron->last_layer, data, stepsize);
