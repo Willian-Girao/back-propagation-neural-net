@@ -11,4 +11,4 @@ A standar implementation of a standard SVM to perform binary classification.
 
 ## Backpropagation Artificial Neural Network (ANN)
 
-A standar implementation of a standard back propagation neural network to perform binary classification.
+A standar implementation of a standard backpropagation neural network to perform binary classification.
