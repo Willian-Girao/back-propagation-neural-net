@@ -9,6 +9,10 @@ Implementations in C of Machine Learning models (WIP).
 
 A standar implementation of a standard SVM to perform binary classification.
 
-## Backpropagation Artificial Neural Network (ANN)
+## Backpropagation Artificial Neural Network (ANN) | W.I.P.
 
 A standar implementation of a standard backpropagation neural network to perform binary classification.
+
+## Data Pattern Analysis Experiment | W.I.P.
+
+Ongoing experiments for novel classifier model validation.
