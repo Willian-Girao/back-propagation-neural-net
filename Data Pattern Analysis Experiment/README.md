@@ -1,3 +1,5 @@
+Ongoing experiments for novel classifier model validation.
+
 # Data Analysis Experiment
 
 1. Get, for each dimension, the standard deviation.
