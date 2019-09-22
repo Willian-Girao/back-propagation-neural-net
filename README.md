@@ -1,9 +1,14 @@
 # Machine Learning Models
 
-Implementations in C of Machine Learning models (WIP).
+Implementations in C and Python of some Machine Learning (ML) models.
 
-* **Suport Vector Machine**
-* **Back Propagation Neural Network**
+- Supervised
+  - Suport Vector Machine
+  - Back Propagation Neural Network
+
+- Unsupervised
+  - K-Means
+  - K Nearest Neighbors
 
 ## Suport Vector Machine (SVM)
 
